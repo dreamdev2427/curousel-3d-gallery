@@ -1,0 +1,8 @@
+POST https://rize2day.com/api/item/get_others_nfts HTTP/1.1
+content-type: application/json
+
+{
+    "fromId": "63f5e09dde7f80142c8bd028",
+    "toId": "63f6c05055d172408c748a0f",
+    "viewMode": "0"
+}

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
+    <title>ERA HOMI Gallery</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="./src/modernizr.custom.53451.js"></script>
+
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        background-color: transparent;
+        margin: 0;
+        font-family: Helvetica, sans-serif;
+        overflow: hidden;
+      }
+
+      a {
+        color: #ffffff;
+      }
+    </style>
+  </head>
+  <body>
+    <section id="dg-container" class="dg-container">
+      <div class="dg-wrapper"></div>
+    </section>
+
+    <script src="./src/jquery.gallery.js"></script>
+    <script>
+      let getParamValue = function () {
+        var url = window.location.search.substring(1); //get rid of "?" in querystring
+        var qArray = url.split("&"); //get key-value pairs
+        let result = {};
+        for (var i = 0; i < qArray.length; i++) {
+          var pArr = qArray[i].split("="); //split key and value
+          result[pArr[0]] = pArr[1];
+        }
+        return result;
+      };
+
+      $(document).ready(function () {
+        // const parseData = getParamValue();
+        // parseData.param = JSON.parse(
+        //   `"${parseData.param.replaceAll("%22", '\\"')}"`
+        // );
+
+        console.log("<<<<<< ready >>>>>> ");
+        $.ajax({
+          type: "POST",
+          // url: parseData.url,
+          // data: parseData.param,
+          url: `http://localhost:5000/api/item/getPopularItems`,
+          headers: { "Content-Type": "application/json" },
+          success: function (res, status) {
+            if (res.code === 0) {
+              let items = res.data;
+              items = items.filter(
+                (x) =>
+                  x.logoURL.toString().toLowerCase().includes(".mp4") === false
+              );
+              console.log(" items >>>>>> ", items);
+              items = [...items, ...items];
+              $.each(items, function (index, item) {
+                let a = $("<a>", {
+                  href: `http://localhost:3000/nft-detail/${item?._id}`,
+                });
+                let img = $("<img>", {
+                  src:
+                    item.fileType >= 2
+                      ? `http://localhost:5000/uploads/${item?.logoURL}`
+                      : `https://cloudflare-ipfs.com/ipfs/${item?.logoURL}`,
+                  alt: `${index}`,
+                });
+                let div = $("<div>").text(item?.name);
+
+                a.append(img);
+                a.append(div);
+
+                $(".dg-wrapper").append(a);
+              });
+              $("#dg-container").gallery({ autoplay: true });
+            } else {
+              alert("gallery view load error");
+            }
+          },
+          error: function (data, status) {},
+        });
+      });
+    </script>
+  </body>
+</html>
